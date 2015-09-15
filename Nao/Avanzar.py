@@ -9,26 +9,37 @@ from naoqi import ALProxy
 
 def Girar(x):
     print "gira"
-    Caminar(motionProxy,0.0,0.0,0.5*x,0.3)
-    time.sleep(5)
-    Caminar(motionProxy,0,0,0,0)
+    #Caminar(motionProxy,0.0,0.0,0.5*x,0.3)
+    #time.sleep(5)
+    #Caminar(motionProxy,0,0,0,0)
 
 def Avanzar():
     print "Avanza"
-    Caminar(motionProxy,0.8,0,0,0.2)
-    time.sleep(6)
+    #Caminar(motionProxy,0.8,0,0,0.2)
+    #time.sleep(6)
 
 def Arrivar():
     ant='n'
+    m=0
     for line in open("2Dpoints"):
         a=[int(i) for i in line[1:-2].split(",")]
         if ant=='n':
+            print "ant=='n'"
             ant=a
-        else:
-            if a[0]>ant[0]:
-                #tal
-            if a[1]>ant[1]:
+            pass
+
+        print "ant: "+str(ant)+" a: "+str(a)+" m: "+str(m)
+        if a[m]==ant[m]:
+            print "a[m]==ant[m]"
+            if m==0:
+                m=1
+            if m==1:
+                m=0
+
+            if a[m]>ant[m]:
                 Girar(1)
+            else:
+                Girar(-1)
         Avanzar()
 
 def Caminar(motionProxy,X,Y,Theta,Frequency):
