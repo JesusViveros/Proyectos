@@ -12,10 +12,11 @@ def To_bn(image):
 	return img
 
 class Route:
-	def __init__(self,mapi,posini,posfin):
+	def __init__(self,mapi,posini,posfin,tam):
 		self.mapi=mapi
 		self.posini=posini
 		self.posfin=posfin
+		self.tam=tam
 		self.virtualspace=[]
 		self.road=[]
 
@@ -55,12 +56,12 @@ class Route:
 				a=i+pos[0]-int(tam/8)
 				b=j+pos[1]-int(tam/8)
 				self.mapi[a,b]=127
-#		cv2.imshow('Prueba',self.mapi)
-#		cv2.waitKey()
+		#cv2.imshow('Prueba',self.mapi)
+		#cv2.waitKey()
 
 
 	def Expand(self,pos,lsi):
-#		self.Marcar(pos)
+		#self.Marcar(pos)
 		a=self.Traduccion(pos)
 
 		val=self.virtualspace[a[0]][a[1]][0]
@@ -138,27 +139,31 @@ class Route:
 			pos=vpn
 
 	def DHCP(self):
-		for i in range(5):
-			for j in range(5):
-				a=i+self.posini[0]-2
-				b=j+self.posini[1]-2
+		for i in range(self.tam):
+			for j in range(self.tam):
+				a=i+self.posini[0]-int(tam/2)
+				b=j+self.posini[1]-int(tam/2)
 				self.mapi[a,b]=63
 
-		for i in range(5):
-			for j in range(5):
-				a=i+self.posfin[0]-2
-				b=j+self.posfin[1]-2
+		for i in range(self.tam):
+			for j in range(self.tam):
+				a=i+self.posfin[0]-int(tam/2)
+				b=j+self.posfin[1]-int(tam/2)
 				self.mapi[a,b]=190
 
-		cv2.imshow('Prueba',self.mapi)
-		cv2.waitKey()
-
-		'''
+		# Error de desfasar
 		dim=self.mapi.shape
 		a=int(self.posini[0]/self.tam)
 		b=int(self.posini[1]/self.tam)
 		c=int((dim[0]-self.posini[0])/self.tam)	
 		d=int((dim[1]-self.posini[1])/self.tam)
+#		print dim[0]/self.tam
+#		print dim[1]/self.tam
+#		print a
+#		print b
+#		print c
+#		print d
+		# Error de desfasar
 
 		for i in range(a+c):
 			self.virtualspace.append([])
@@ -187,7 +192,6 @@ class Route:
 					return
 
 			lista1=[]
-		'''
 
 	def Topic(self):
 		self.MRoad() #    ------------------------
@@ -212,10 +216,14 @@ def Convert(pix):
 
 if __name__ == '__main__':
 	mapi = 'a.png'
-	pi=[100,100]
-	pf=[50,50]
+
+	pi=[50,50]
+	pf=[100,200]
+	tam=7
+
 	img=To_bn(mapi)
-	resmap=Route(img,pi,pf)
+
+	resmap=Route(img,pi,pf,tam) 
 	resmap.DHCP() 
-#	resmap.Topic()
-#	resmap.Salvar()
+	resmap.Topic()
+	resmap.Salvar()
