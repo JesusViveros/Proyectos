@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import rospy
-from std_msgs.msg import String
 import sys
 import motion
 import time
@@ -15,8 +13,8 @@ def Girar(x):
 
 def Avanzar():
     print "Avanza"
-    Caminar(motionProxy,0.8,0,0,0.2)
-    time.sleep(6)
+    #Caminar(motionProxy,0.8,0,0,0.2)
+    #time.sleep(6)
 
 def Arrivar():
     orientation='N'
@@ -46,15 +44,15 @@ def Arrivar():
             if orientation=='N':
                 print "orientation=='N'"
                 orientation='D'
-                Girar(1)
+                Girar(-1)
             elif orientation=='D':
                 print "orientation=='D'"
                 orientation='S'
-                Girar(1)
+                Girar(-1)
             elif orientation=='S':
                 print "orientation=='S'"
                 orientation=='D'
-                Girar(-1)
+                Girar(1)
         ant=a
         Avanzar()
 
