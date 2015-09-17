@@ -22,24 +22,28 @@ def Arrivar():
     ant='n'
     m=0
     for line in open("2Dpoints"):
+    	print "                   FOR"
         a=[int(i) for i in line[1:-2].split(",")]
         if ant=='n':
             print "ant=='n'"
             ant=a
-            pass
+            continue
 
         print "ant: "+str(ant)+" a: "+str(a)+" m: "+str(m)
         if a[m]==ant[m]:
             print "a[m]==ant[m]"
             if m==0:
                 m=1
-            if m==1:
+                print "M==1"
+            else:
                 m=0
+                print "M==0"
 
             if a[m]>ant[m]:
                 Girar(1)
             else:
                 Girar(-1)
+        ant=a
         Avanzar()
 
 def Caminar(motionProxy,X,Y,Theta,Frequency):
