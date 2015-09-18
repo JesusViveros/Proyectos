@@ -126,6 +126,7 @@ sudo gedit packettracer.desktop
  Type=Application
 
 -ssh
+
 sudo apt-get install openssh-server
 
 -latexstudio

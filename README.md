@@ -1,2 +1,2 @@
 # Proyectos
-Codigos OpenCv y NAoqi
+Codigos OpenCv y Aldebaran

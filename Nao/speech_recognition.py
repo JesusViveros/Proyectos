@@ -50,6 +50,7 @@ def Stiffness(proxy,x):
     proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def main(robotIP,robotPort):
+    print "MAIN"
     global motionProxy
     global postureProxy
     global tts
@@ -59,32 +60,51 @@ def main(robotIP,robotPort):
     except Exception, e:
         print "Could not create proxy to ALMotion"
         #print "Error was: ", e
-
+    print "ALMotion"
     try:
         postureProxy = ALProxy("ALRobotPosture", robotIP, robotPort)
     except Exception, e:
         print "Could not create proxy to ALRobotPosture"
         #print "Error was: ", e
-
+    print "ALRobotPosture"
     try:
         tts = ALProxy("ALTextToSpeech", robotIP, robotPort)
     except Exception,e:
         print "Could not create proxy to ALTextToSpeech"
         #print "Error was: ",e
-
+    print "ALTextToSpeech"
     try:
-        tts = ALProxy("ALTextToSpeech", robotIP, robotPort)
+        asr = ALProxy("ALSpeechRecognition", robotIP, robotPort)
     except Exception,e:
-        print "Could not create proxy to ALTextToSpeech"
+        print "Could not create proxy to ALSpeechRecognition"
         #print "Error was: ",e
- 
-    motionProxy.setWalkArmsEnabled(True, True)
-    motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]])
+    print "ALSpeechRecognition"
+    try:
+        memory = ALProxy("ALMemory",robotIp, robotPort)
+    except Exception,e:
+        print "Could not create proxy to ALSpeechRecognition"
+        #print "Error was: ",e
+    print "ALMemory"
+    #tts.say("Ya casi")
 
-    print tts.getLanguage()
+    asr.getAudioExpression()
 
-    postureProxy.goToPosture("Crouch",1)
-    Stiffness(motionProxy,0)
+    #asr.setLanguage("Spanish")
+    #vocabulary = ["si", "no", "Pararse", "Abajo"]
+    #asr.setVocabulary(vocabulary, True)
+
+    #asr.subscribe("Test_ASR")
+    #print 'Speech recognition engine started'
+    #time.sleep(10)
+    #asr.unsubscribe("Test_ASR")
+    #data = memory.getData("WordRecognized")
+    #print "the data is"
+    #print data
+    #print( "data: %s" % data )
+    
+    print "FIN"
+    #postureProxy.goToPosture("Crouch",1)
+    #Stiffness(motionProxy,0)
 
 if __name__ == "__main__":
     robotIp = "148.226.225.74"
