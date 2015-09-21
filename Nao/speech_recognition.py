@@ -85,23 +85,24 @@ def main(robotIP,robotPort):
         print "Could not create proxy to ALSpeechRecognition"
         #print "Error was: ",e
     print "ALMemory"
-    #tts.say("Ya casi")
 
-    asr.getAudioExpression()
+    asr.setLanguage("Spanish")
+    vocabulary = ["si", "no", "Pararse", "Abajo"]
 
-    #asr.setLanguage("Spanish")
-    #vocabulary = ["si", "no", "Pararse", "Abajo"]
-    #asr.setVocabulary(vocabulary, True)
+    asr.setVocabulary(vocabulary, True)
+    asr.setWordListAsVocabulary(vocabulary)
+    asr.subscribe("Test_ASR")
+    print 'Speech recognition engine started'
+    time.sleep(3)
+    asr.unsubscribe("Test_ASR")
+    data = memory.getData("WordRecognized")
+    print "the data is"
+    print data
+    print( "data: %s" % data )
+    a=['',-3.0]
+    if data==a:
+        tts.say("Hola")
 
-    #asr.subscribe("Test_ASR")
-    #print 'Speech recognition engine started'
-    #time.sleep(10)
-    #asr.unsubscribe("Test_ASR")
-    #data = memory.getData("WordRecognized")
-    #print "the data is"
-    #print data
-    #print( "data: %s" % data )
-    
     print "FIN"
     #postureProxy.goToPosture("Crouch",1)
     #Stiffness(motionProxy,0)
