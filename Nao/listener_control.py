@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+# Lo de arriba es una variable del sistema....No mover
+# Librerias de ROS...Para comunicar nodos
 import rospy
 from std_msgs.msg import String
-
+# Libreras del sistema, NAOQI, matematicas y tiempo
 import sys
 import motion
 import time
@@ -131,6 +133,7 @@ def Stiffness(proxy,x):
     proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def main(robotIP,robotPort):
+    # Define
     global motionProxy
     global postureProxy
     global tts
@@ -138,32 +141,29 @@ def main(robotIP,robotPort):
         motionProxy = ALProxy("ALMotion", robotIP, robotPort)
     except Exception, e:
         print "Could not create proxy to ALMotion"
-        #print "Error was: ", e
 
     try:
         postureProxy = ALProxy("ALRobotPosture", robotIP, robotPort)
     except Exception, e:
         print "Could not create proxy to ALRobotPosture"
-        #print "Error was: ", e
 
     try:
         tts = ALProxy("ALTextToSpeech", robotIP, robotPort)
     except Exception,e:
         print "Could not create proxy to ALTextToSpeech"
-        #print "Error was: ",e
  
-    motionProxy.setWalkArmsEnabled(True, True)
-    motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]])
+    motionProxy.setWalkArmsEnabled(True, True) # Permite mover los brazos al mismo tiempo que camina (LeftArm,RightArm)
+    motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]]) # Activa los bumpers de los pies
 
-    Stiffness(motionProxy,1)
-    Posture(postureProxy,"StandInit",1)
+    Stiffness(motionProxy,1) # Funcion para los motores...1 es encender
+    Posture(postureProxy,"StandInit",1) # Llama a la funcion de posturas....nombre de postura + velocidad 0-1
 
     listener()
 
-    postureProxy.goToPosture("Sit", 1)
-    Stiffness(motionProxy,0)
+    postureProxy.goToPosture("Sit", 1) # Llama a la funcion de posturas....nombre de postura + velocidad 0-1
+    Stiffness(motionProxy,0) # Funcion para los motores...0 es apagar
 
 if __name__ == "__main__":
-    robotIp = "192.168.1.102"
-    robotPort = 9559
-    main(robotIp,robotPort)
+    robotIp = "192.168.1.102" #Direccion IP del NAO
+    robotPort = 9559  # Puerto del NAO
+    main(robotIp,robotPort)  # Llama a la funcion main()
