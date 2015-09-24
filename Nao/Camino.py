@@ -214,7 +214,6 @@ def Convert(pix):
 	b=int(pix[1]*20)+244
 	return [a,b]
 
-if __name__ == '__main__':
 	mapi = 'a.png'
 
 	pi=[50,50]

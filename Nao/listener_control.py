@@ -3,6 +3,7 @@
 # Librerias de ROS...Para comunicar nodos
 import rospy
 from std_msgs.msg import String
+from nao.msg import naomss
 # Libreras del sistema, NAOQI, matematicas y tiempo
 import sys
 import motion
@@ -10,83 +11,31 @@ import time
 import math
 from naoqi import ALProxy
 
-def callback(data):
-    print "Entro al callback"
+def callbackRV(data):
+    print "Entro al callbackRV"
     c=data.data
-
-    if c[0]!='5':
-        c = [int(i) for i in c[1:-1].split(",")]
-
-    if c[0]==1:
-        print "Pararse"
+    print c
+    if c=="Parate":
         Stiffness(motionProxy,1)
         Posture(postureProxy,"StandInit",1)
-
-    if c[0]==2:
-        print "Sentarse"
-        Posture(postureProxy,"Sit",1)
+    if c=="Sientate":
+        Posture(postureProxy,"Crouch",1)
         Stiffness(motionProxy,0)
-
-    if c[0]==3:
-        print "Caminar"
-        Caminar(motionProxy,c[1]/10.0,c[2]/10.0,c[3]/10.0,c[4]/10.0)
-        if c[5]!=0:
-            time.sleep(3)
-            Detenerse(motionProxy)
-
-    if c[0]==4:
-        print "Mover Brazo"
-        ArmL = [c[2], c[3], c[4], c[5], c[6]]
-        Cuerpo(motionProxy,ArmL,c[1])
-
-    if c[0]=='5':
-        print "Hablar"
-        tts.say(c[1:])
-
-    if c[0]==6:
-        print "Detenerse"
+    if c=="Camina":
+        Caminar(motionProxy,0.8,0.0,0.0,0.2)
+    if c=="Detente":
         Detenerse(motionProxy)
 
-    if c[0]==7:
-        print "Cambiar Pose"
-        if c[1]==1:
-            Posture(postureProxy,"Stand",1)
-        if c[1]==2:
-            Posture(postureProxy,"StandZero",1)
-        if c[1]==3:
-            Posture(postureProxy,"Crouch",1)
-        if c[1]==4:
-            Posture(postureProxy,"SitRelax",1)
-        if c[1]==5:
-            Posture(postureProxy,"LyingBelly",1) # No la hace
-        if c[1]==6:
-            Posture(postureProxy,"LyingBack",1) # No la hace
-
-    if c[0]==8:
-        print "Escucho"
-        asr.setLanguage("English")
-        vocabulary = ["hello", "my","name","is","kratos"]
-        asr.setVocabulary(vocabulary, True)
-        asr.subscribe("Test_ASR")
-        time.sleep(20)
-        asr.unsubscribe("Test_ASR")
-
-    if c[0]==9:
-        print "Mano"
-        handName = ""        
-        if c[1]==1:
-            handName = 'RHand'
-        else:
-            handName = 'LHand'
-        if c[2]==1:
-            motionProxy.closeHand(handName)
-        else:
-            motionProxy.openHand(handName)
+def callbackSR(data):
+    print "Entro al callbackRV"
+    c=data.data
+    print c
 
 def listener():
     print "Entro al listener"
     rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber("prueba", String, callback)
+    rospy.Subscriber("RVoz", String, callbackRV)
+    rospy.Subscriber("Sonar", naomss, callbackSR)
     rospy.spin()
 
 def Cuerpo(motionProxy,ArmL,Part):
@@ -141,29 +90,20 @@ def main(robotIP,robotPort):
         motionProxy = ALProxy("ALMotion", robotIP, robotPort)
     except Exception, e:
         print "Could not create proxy to ALMotion"
-
     try:
         postureProxy = ALProxy("ALRobotPosture", robotIP, robotPort)
     except Exception, e:
         print "Could not create proxy to ALRobotPosture"
-
     try:
         tts = ALProxy("ALTextToSpeech", robotIP, robotPort)
     except Exception,e:
         print "Could not create proxy to ALTextToSpeech"
- 
     motionProxy.setWalkArmsEnabled(True, True) # Permite mover los brazos al mismo tiempo que camina (LeftArm,RightArm)
     motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]]) # Activa los bumpers de los pies
 
-    Stiffness(motionProxy,1) # Funcion para los motores...1 es encender
-    Posture(postureProxy,"StandInit",1) # Llama a la funcion de posturas....nombre de postura + velocidad 0-1
-
     listener()
 
-    postureProxy.goToPosture("Sit", 1) # Llama a la funcion de posturas....nombre de postura + velocidad 0-1
-    Stiffness(motionProxy,0) # Funcion para los motores...0 es apagar
-
 if __name__ == "__main__":
-    robotIp = "192.168.1.102" #Direccion IP del NAO
+    robotIp = "148.226.225.94" #Direccion IP del NAO
     robotPort = 9559  # Puerto del NAO
     main(robotIp,robotPort)  # Llama a la funcion main()
