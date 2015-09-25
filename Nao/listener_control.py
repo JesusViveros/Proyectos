@@ -27,15 +27,25 @@ def callbackRV(data):
         Detenerse(motionProxy)
 
 def callbackSR(data):
-    print "Entro al callbackRV"
+    print "Entro al callbackSR"
     c=data.data
-    print c
+    if c=="ObsL":
+        print "ObsL"
+        Detenerse(motionProxy)
+        Caminar(motionProxy,0.0,0.0,-0.5,0.2)
+    if c=="ObsR":
+        print "ObsR"
+        Detenerse(motionProxy)
+        Caminar(motionProxy,0.0,0.0,0.5,0.2)
+    time.sleep(5)
+    Detenerse(motionProxy)
+    #Caminar(motionProxy,0.8,0.0,0.0,0.2)
 
 def listener():
     print "Entro al listener"
     rospy.init_node('listener', anonymous=True)
     rospy.Subscriber("RVoz", String, callbackRV)
-    rospy.Subscriber("Sonar", naomss, callbackSR)
+    rospy.Subscriber("Sonar", String, callbackSR)
     rospy.spin()
 
 def Cuerpo(motionProxy,ArmL,Part):
@@ -82,7 +92,6 @@ def Stiffness(proxy,x):
     proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def main(robotIP,robotPort):
-    # Define
     global motionProxy
     global postureProxy
     global tts
@@ -98,12 +107,12 @@ def main(robotIP,robotPort):
         tts = ALProxy("ALTextToSpeech", robotIP, robotPort)
     except Exception,e:
         print "Could not create proxy to ALTextToSpeech"
-    motionProxy.setWalkArmsEnabled(True, True) # Permite mover los brazos al mismo tiempo que camina (LeftArm,RightArm)
-    motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]]) # Activa los bumpers de los pies
+    motionProxy.setWalkArmsEnabled(True, True)
+    motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]])
 
     listener()
 
 if __name__ == "__main__":
-    robotIp = "148.226.225.94" #Direccion IP del NAO
-    robotPort = 9559  # Puerto del NAO
-    main(robotIp,robotPort)  # Llama a la funcion main()
+    robotIp = "148.226.221.134"
+    robotPort = 9559
+    main(robotIp,robotPort)

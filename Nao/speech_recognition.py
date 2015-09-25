@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import rospy
-import std_msgs.msg as std
-
+from std_msgs.msg import String
 import sys
 import motion
 import time
 from naoqi import ALProxy
 
 def talker(val):
-    pub = rospy.Publisher('Nao',std.String,queue_size=4)
+    pub = rospy.Publisher('RVoz',String,queue_size=4)
     rospy.init_node('RVoz', anonymous=True)
     rate = rospy.Rate(10)
     pub.publish(val)
@@ -57,6 +56,6 @@ def main(robotIP,robotPort):
     asr.unsubscribe("ASR")
 
 if __name__ == "__main__":
-    robotIp = "148.226.225.94"
+    robotIp = "148.226.221.134"
     robotPort = 9559
     main(robotIp,robotPort)
