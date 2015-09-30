@@ -11,6 +11,13 @@ import time
 import math
 from naoqi import ALProxy
 
+def talker(val):
+    pub = rospy.Publisher('Retroalimentacion',String,queue_size=4)
+    rospy.init_node('listener', anonymous=True)
+    rate = rospy.Rate(10)
+    pub.publish(val)
+    rate.sleep()
+
 def callbackRV(data):
     print "Entro al callbackRV"
     c=data.data
@@ -41,11 +48,37 @@ def callbackSR(data):
     Detenerse(motionProxy)
     #Caminar(motionProxy,0.8,0.0,0.0,0.2)
 
+def callbackT(data):
+    c=data.data
+    if c[0]==1:
+        print "Pararse"
+        Stiffness(motionProxy,1)
+        Posture(postureProxy,"StandInit",1)
+    if c[0]==2:
+        print "Sentarse"
+        Posture(postureProxy,"Crouch",2)
+        Stiffness(motionProxy,0)
+    if c[0]==3:
+        print "Caminar"
+        Caminar(motionProxy,c[1]/10.0,c[2]/10.0,c[3]/10.0,c[4]/10.0)
+        if c[5]!=0:
+            time.sleep(c[5])
+            Detenerse(motionProxy)
+    if c[0]==8:
+        print "Detener"
+        Detenerse(motionProxy)
+
+def callTouch(data):
+    print "callTouch"
+    talker("Seal")
+
 def listener():
     print "Entro al listener"
     rospy.init_node('listener', anonymous=True)
     rospy.Subscriber("RVoz", String, callbackRV)
     rospy.Subscriber("Sonar", String, callbackSR)
+    rospy.Subscriber("Teclado", naomss, callbackT)
+    rospy.Subscriber('TactilTouch',String, callTouch)
     rospy.spin()
 
 def Cuerpo(motionProxy,ArmL,Part):
@@ -113,6 +146,6 @@ def main(robotIP,robotPort):
     listener()
 
 if __name__ == "__main__":
-    robotIp = "148.226.221.134"
+    robotIp = "148.226.225.217"
     robotPort = 9559
     main(robotIp,robotPort)
