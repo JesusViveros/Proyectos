@@ -4,8 +4,7 @@ import cv2
 import cv
 import numpy as np
 import urllib
-
-# Se modifica el primer valor
+import time
 
 def talker(val):
     pub = rospy.Publisher('RVision',String,queue_size=4)
@@ -13,9 +12,8 @@ def talker(val):
     rate = rospy.Rate(10)
     pub.publish(val)
     rate.sleep()
-
-points =[]
-fps = 25
+points=[]
+fps=25
 capSize = (320,240) # this is the size of my source video
 fourcc = cv2.cv.CV_FOURCC('X','V','I','D')
 
@@ -36,40 +34,26 @@ AbI = "http://192.168.0.100/command/ptzf.cgi?relative=0710"
 Wide = "http://192.168.0.100/command/ptzf.cgi?relative=1010"
 Tele = "http://192.168.0.100/command/ptzf.cgi?relative=1110"
 setting = "http://192.168.0.100/command/presetposition.cgi?HomePos"
-
 url2 ="http://192.168.0.100/oneshotimage.jpg"
 
 video = cv2.VideoWriter('output.avi',fourcc,fps,capSize)
 
-def Contornos(thresh,frame):
-        # find contours in the threshold image
-        contours,_ = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+def Objeto(thresh,frame):
+    contours,_ = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
-        # finding contour with maximum area and store it as best_cnt
-        max_area = 0
-        best_cnt = 1
-        area = 0
+    max_area = 0
+    best_cnt = 1
+    area = 0
 
-        for cnt in contours:
-            area = cv2.contourArea(cnt)
-            if area > max_area:
-                max_area = area
-                best_cnt = cnt
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > max_area:
+            max_area = area
+            best_cnt = cnt
 
-        # Encuentra el centroide de el cuerpo detectado
-        M = cv2.moments(best_cnt)
-        cx,cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-
-        if (cx != 0):
-            #print str(cx)+"  "+str(cy)
-            points.append((cx,cy))
-
-        w = len(points)
-
-        #si no hay nada no guarda coordenadas (0,0)
-        for i in range(0,w-1):
-            cv2.line(frame,(points[i]),(points[i+1]),(255,0,0),2)
-        return frame
+    M = cv2.moments(best_cnt)
+    cx,cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+    return [cx,cy]
 
 def main():
     while True:
@@ -77,25 +61,35 @@ def main():
         frame = cv2.flip(image,-1)
         frame = cv2.blur(frame,(3,3))
 
-        # convert to hsv and find range of colors
         hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        cv2.line(frame,(0,120),(340,120),(0,255,0),1)
 
-        #threshred = cv2.inRange(hsv,np.array((103,150, 150)), np.array((140,255,255)))
-        threshred = cv2.inRange(hsv,np.array((0,0,0)), np.array((180,0,0)))
-        #threshgreen = cv2.inRange(hsv,np.array((60,150,182)), np.array((72,171,222)))
+        threshred = cv2.inRange(hsv,np.array((113,63,70)), np.array((168,159,130)))
+        threshgreen = cv2.inRange(hsv,np.array((54,145,165)), np.array((78,180,255)))
 
         thresh2red = threshred.copy()
-        #thresh2green = threshgreen.copy()
+        thresh2green = threshgreen.copy()
 
-        frame=Contornos(threshred,frame)
-        #frame=Contornos(threshred,frame)
+        Otx=Objeto(threshred,frame)
+        Ntx=Objeto(threshgreen,frame)
 
-        #video.write(image) 
+        m=[255,255]
+        if Otx[0]!=0 and Ntx[0]!=0:
+            m[0]=Otx[0]-Ntx[0]
+            m[1]=Otx[1]-Ntx[1]
+            if m[0]<0:
+                m[0]=m[0]*-1
+            if m[1]<0:
+                m[1]=m[1]*-1
+            #print str(Otx)+" "+str(Ntx)+" "+str(m)
+        if m[0]<15:
+            talker("arrive")
+            time.sleep(2)
+
+        video.write(image) 
 
         cv2.imshow('frame',frame)
-        cv2.imshow('threshred',threshred)
-        #cv2.imshow('threshgreen',threshgreen)
+        cv2.imshow('threshred',thresh2red)
+        cv2.imshow('threshgreen',threshgreen)
 
         tecla =cv2.waitKey(15)
         if (tecla>0):

@@ -48,6 +48,26 @@ def callbackSR(data):
     Detenerse(motionProxy)
     #Caminar(motionProxy,0.8,0.0,0.0,0.2)
 
+def callCam(data):
+    print "callCam"
+    tts.say("Objetivo")
+
+    val=[0,0,0,0,0]
+    Cuerpo(motionProxy,val,2)
+
+    val=[90,0,0,0,-104]
+    Cuerpo(motionProxy,val,2)
+
+    val=[0,76,0,0,-119]
+    Cuerpo(motionProxy,val,2)
+
+    val=[0,0,0,0,-104]
+    Cuerpo(motionProxy,val,2)
+
+    val=[90,0,0,0,-104]
+    Cuerpo(motionProxy,val,2)
+
+
 def callbackT(data):
     c=data.data
     if c[0]==1:
@@ -77,6 +97,7 @@ def listener():
     rospy.init_node('listener', anonymous=True)
     rospy.Subscriber("RVoz", String, callbackRV)
     rospy.Subscriber("Sonar", String, callbackSR)
+    rospy.Subscriber("RVision",String, callCam)
     rospy.Subscriber("Teclado", naomss, callbackT)
     rospy.Subscriber('TactilTouch',String, callTouch)
     rospy.spin()
