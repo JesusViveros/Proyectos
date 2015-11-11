@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # Viveros Aguilar Jesus Martin
 import rospy
-import std_msgs.msg as std
+from nao.msg import naomss
 
 def talker(val):
-    pub = rospy.Publisher('prueba',std.String,queue_size=4)
+    pub = rospy.Publisher('Teclado',naomss,queue_size=4)
     rospy.init_node('talker2', anonymous=True)
     rate = rospy.Rate(10)
     pub.publish(val)
@@ -42,10 +42,7 @@ if __name__ == '__main__':
             val[1]=int(raw_input("Mano Der/Izq 1/2: "))
             val[2]=int(raw_input("Mano Abrir/cerrar 2/1: "))
 
-        val=str(val)
-
         try:
             talker(val)
         except rospy.ROSInterruptException:
             pass
-

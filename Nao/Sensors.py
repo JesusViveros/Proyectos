@@ -1,20 +1,34 @@
 #!/usr/bin/env python
+import rospy
+from std_msgs.msg import String
 from naoqi import ALProxy
 
+def talker(val):
+    pub = rospy.Publisher('TactilTouch',String,queue_size=4)
+    rospy.init_node('Sensor', anonymous=True)
+    rate = rospy.Rate(10)
+    pub.publish(val)
+    rate.sleep()
+
 def main(robotIp,robotPort):
-    sensorProxy = ALProxy("ALSensors",robotIp,robotPort)
-    memoryProxy = ALProxy("ALMemory",robotIp,robotPort)
+    sensor = ALProxy("ALSensors",robotIp,robotPort)
+    memory = ALProxy("ALMemory",robotIp,robotPort)
 
-    sensorProxy.subscribe("myApplication")
-    memory.subscribeToEvent("Evento","RightBumperPressed","RightBumperPressed")
+    sensor.subscribe("myApplication")
+    memory.subscribeToEvent("Evento","FrontTactilTouched","FrontTactilTouched")
 
-    rbp=memory.getData("RightBumperPressed")
-    print rbp
-    # Please read Sonar ALMemory keys section if you want to know the other values you can get.
-    memory.unsubscribeToEvent("Evento","RightBumperPressed")
-    sensorProxy.unsubscribe("myApplication")
+    while 1:
+        rbp=memory.getData("FrontTactilTouched")
+        if rbp==1.0:
+            print rbp
+            talker("seal")
+            time.sleep(3)
+        print rbp
+
+    memory.unsubscribeToEvent("Evento","FrontTactilTouched")
+    sensor.unsubscribe("myApplication")
 
 if __name__ == "__main__":
-    robotIp = "148.226.225.94"
+    robotIp = "148.226.225.217"
     robotPort = 9559
     main(robotIp,robotPort)
