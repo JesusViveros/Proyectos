@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+import time
 from naoqi import ALProxy
 
 def talker(val):
@@ -18,17 +19,16 @@ def main(robotIp,robotPort):
     memory.subscribeToEvent("Evento","FrontTactilTouched","FrontTactilTouched")
 
     while 1:
-        rbp=memory.getData("FrontTactilTouched")
-        if rbp==1.0:
-            print rbp
-            talker("seal")
+        ftt=memory.getData("FrontTactilTouched")
+        if ftt==1.0:
+            print "ftt"
+            talker("ftt")
             time.sleep(3)
-        print rbp
 
     memory.unsubscribeToEvent("Evento","FrontTactilTouched")
     sensor.unsubscribe("myApplication")
 
 if __name__ == "__main__":
-    robotIp = "148.226.225.217"
+    robotIp = "148.226.225.243"
     robotPort = 9559
     main(robotIp,robotPort)

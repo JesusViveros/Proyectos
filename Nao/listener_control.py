@@ -3,7 +3,6 @@
 # Librerias de ROS...Para comunicar nodos
 import rospy
 from std_msgs.msg import String
-from nao.msg import naomss
 # Libreras del sistema, NAOQI, matematicas y tiempo
 import sys
 import motion
@@ -18,20 +17,11 @@ def talker(val):
     pub.publish(val)
     rate.sleep()
 
-def callbackRV(data):
-    print "Entro al callbackRV"
+def callTouch(data):
+    print "callTouch"
     c=data.data
-    print c
-    if c=="Parate":
-        Stiffness(motionProxy,1)
-        Posture(postureProxy,"StandInit",1)
-    if c=="Sientate":
-        Posture(postureProxy,"Crouch",1)
-        Stiffness(motionProxy,0)
-    if c=="Camina":
-        Caminar(motionProxy,0.8,0.0,0.0,0.2)
-    if c=="Detente":
-        Detenerse(motionProxy)
+    if c=="ftt":
+        talker("ftt")
 
 def callbackSR(data):
     print "Entro al callbackSR"
@@ -48,12 +38,24 @@ def callbackSR(data):
     Detenerse(motionProxy)
     #Caminar(motionProxy,0.8,0.0,0.0,0.2)
 
+def callbackRV(data):
+    print "Entro al callbackRV"
+    c=data.data
+    print c
+    if c=="Parate":
+        Stiffness(motionProxy,1)
+        Posture(postureProxy,"StandInit",1)
+    if c=="Sientate":
+        Posture(postureProxy,"Crouch",1)
+        Stiffness(motionProxy,0)
+    if c=="Camina":
+        Caminar(motionProxy,0.8,0.0,0.0,0.2)
+    if c=="Detente":
+        Detenerse(motionProxy)
+
 def callCam(data):
     print "callCam"
     tts.say("Objetivo")
-
-    val=[0,0,0,0,0]
-    Cuerpo(motionProxy,val,2)
 
     val=[90,0,0,0,-104]
     Cuerpo(motionProxy,val,2)
@@ -67,39 +69,68 @@ def callCam(data):
     val=[90,0,0,0,-104]
     Cuerpo(motionProxy,val,2)
 
+def callCam2(data):
+    print "callCam"
+    tts.say("Objetivo")
 
-def callbackT(data):
+    val=[90,0,0,0,-104]
+    Cuerpo(motionProxy,val,3)
+
+    val=[0,76,0,0,-119]
+    Cuerpo(motionProxy,val,3)
+
+    val=[0,0,0,0,-104]
+    Cuerpo(motionProxy,val,3)
+
+    val=[90,0,0,0,-104]
+    Cuerpo(motionProxy,val,3)
+
+
+def callTec(data):
     c=data.data
+    c=[int(y) for y in c[1:-1].split(",")]
     if c[0]==1:
-        print "Pararse"
+        print"Parar"
         Stiffness(motionProxy,1)
         Posture(postureProxy,"StandInit",1)
     if c[0]==2:
-        print "Sentarse"
-        Posture(postureProxy,"Crouch",2)
+        print"Sentar"
+        Posture(postureProxy,"Crouch",1)
         Stiffness(motionProxy,0)
     if c[0]==3:
-        print "Caminar"
+        print"Caminar"
         Caminar(motionProxy,c[1]/10.0,c[2]/10.0,c[3]/10.0,c[4]/10.0)
         if c[5]!=0:
             time.sleep(c[5])
             Detenerse(motionProxy)
-    if c[0]==8:
-        print "Detener"
-        Detenerse(motionProxy)
+    if c[0]==4:
+        print"Brazo"
+        Cuerpo(motionProxy,c[2:],c[1])
 
-def callTouch(data):
-    print "callTouch"
-    talker("Seal")
+    if c[0]==5:
+        print"ManoCerrar"
+        if c[1]==0:
+            motionProxy.openHand('LHand')
+        if c[1]==1:
+            motionProxy.closeHand('LHand')
+    if c[0]==8:
+        print "Detenerse"
+        Detenerse(motionProxy)
+    if c[0]==9:
+        motionProxy.openHand('LHand')
+
 
 def listener():
     print "Entro al listener"
     rospy.init_node('listener', anonymous=True)
+
     rospy.Subscriber("RVoz", String, callbackRV)
-    rospy.Subscriber("Sonar", String, callbackSR)
     rospy.Subscriber("RVision",String, callCam)
-    rospy.Subscriber("Teclado", naomss, callbackT)
+    rospy.Subscriber("RVision",String, callCam2)
+    rospy.Subscriber("Teclado",String, callTec)
+    rospy.Subscriber("Sonar", String, callbackSR)
     rospy.Subscriber('TactilTouch',String, callTouch)
+
     rospy.spin()
 
 def Cuerpo(motionProxy,ArmL,Part):
@@ -167,6 +198,7 @@ def main(robotIP,robotPort):
     listener()
 
 if __name__ == "__main__":
-    robotIp = "148.226.225.217"
+    robotIp = "148.226.221.114"
     robotPort = 9559
     main(robotIp,robotPort)
+

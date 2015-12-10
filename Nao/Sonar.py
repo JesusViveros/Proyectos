@@ -16,7 +16,6 @@ def main(robotIp,robotPort):
     sonarProxy.subscribe("Sensores")
     memoryProxy = ALProxy("ALMemory",robotIp,robotPort)
     while (1):
-        # Get sonar left first echo (distance in meters to the first obstacle).
         left=memoryProxy.getData("Device/SubDeviceList/US/Left/Sensor/Value")
         right=memoryProxy.getData("Device/SubDeviceList/US/Right/Sensor/Value")
         val=[left,right]
@@ -39,6 +38,6 @@ def main(robotIp,robotPort):
     sonarProxy.unsubscribe("Sensores")
 
 if __name__ == "__main__":
-    robotIp = "148.226.221.134"
+    robotIp = "148.226.221.114"
     robotPort = 9559
     main(robotIp,robotPort)

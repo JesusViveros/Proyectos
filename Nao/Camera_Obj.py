@@ -4,6 +4,7 @@ import cv2
 import cv
 import numpy as np
 import urllib
+import math
 import time
 
 def talker(val):
@@ -56,6 +57,7 @@ def Objeto(thresh,frame):
     return [cx,cy]
 
 def main():
+    a5 = 0
     while True:
         image = url_to_image(url2)
         frame = cv2.flip(image,-1)
@@ -63,8 +65,8 @@ def main():
 
         hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
 
-        threshred = cv2.inRange(hsv,np.array((113,63,70)), np.array((168,159,130)))
-        threshgreen = cv2.inRange(hsv,np.array((54,145,165)), np.array((78,180,255)))
+        threshred = cv2.inRange(hsv,np.array((113,63,70)), np.array((168,159,130)))    # Verde
+        threshgreen = cv2.inRange(hsv,np.array((54,145,165)), np.array((78,180,255)))  # Rojo
 
         thresh2red = threshred.copy()
         thresh2green = threshgreen.copy()
@@ -73,17 +75,18 @@ def main():
         Ntx=Objeto(threshgreen,frame)
 
         m=[255,255]
+        suma=100
+
         if Otx[0]!=0 and Ntx[0]!=0:
             m[0]=Otx[0]-Ntx[0]
             m[1]=Otx[1]-Ntx[1]
-            if m[0]<0:
-                m[0]=m[0]*-1
-            if m[1]<0:
-                m[1]=m[1]*-1
-            #print str(Otx)+" "+str(Ntx)+" "+str(m)
-        if m[0]<15:
+            suma=pow(m[0],2)+pow(m[1],2)
+            suma=math.sqrt(suma)
+            print str(suma)
+        if (suma<80 and a5==0):
+            print "TALKER"
+            a5=5
             talker("arrive")
-            time.sleep(2)
 
         video.write(image) 
 
