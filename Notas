@@ -157,6 +157,15 @@ sudo apt-get install jdownloader-installer
 ps -u alpha : Muestra procesos
 sudo kill -9 NUMProceso
 
+Android Studio
+sudo apt-add-repository ppa:paolorotolo/android-studio
+sudo apt-get update
+sudo apt-get install android-studio
+sudo apt-get install virtualbox-5.0 (Para genymotion)
+
+freenect
+sudo apt-get install freenect
+
 Subir actualizaciones
 
 git status
